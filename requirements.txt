@@ -1,0 +1,6 @@
+expression
+hypothesis
+pytest
+pytest-cov
+pytest-asyncio
+pre-commit
