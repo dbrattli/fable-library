@@ -17,21 +17,12 @@ class AsyncBuilder:
         return self.Bind(computation1, lambda _: computation2)
 
     def Delay(self, generator: Callable[[], Awaitable[T]]) -> Awaitable[T]:
-        print("Delay", generator)
-        # class Deferred(Awaitable[U]):
-        #     def __await__(self) -> Awaitable[T]:
-        #         ret = generator()
-        #         print("Ret: ", ret)
-        #         yield ret
-
         async def deferred() -> T:
-            print("----------------------")
             return await generator()
 
         return deferred()
 
     def Return(self, value: Optional[T] = None) -> Awaitable[Optional[T]]:
-        print("Return")
         return from_result(value)
 
     def ReturnFrom(self, computation: Awaitable[T]) -> Awaitable[T]:
