@@ -73,6 +73,10 @@ def full_name(t: TypeInfo) -> str:
     return t.fullname
 
 
+def tuple_type(*generics: TypeInfo) -> TypeInfo:
+    return TypeInfo(fullname=f"System.Tuple`{len(generics)}", generics=list(generics))
+
+
 obj_type: TypeInfo = TypeInfo(fullname="System.Object")
 unit_type: TypeInfo = TypeInfo("Microsoft.FSharp.Core.Unit")
 char_type: TypeInfo = TypeInfo("System.Char")

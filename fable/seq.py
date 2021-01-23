@@ -12,6 +12,7 @@ def map(mapper: Callable[[A], B], xs: Seq[A]) -> Seq[B]:
 delay = seq.delay
 rangeNumber = seq.range
 singleton = seq.singleton
+empty = seq.empty
+append = seq.concat
 
-
-__all__ = ["delay", "map", "rangeNumber", "singleton"]
+__all__ = ["delay", "empty", "map", "rangeNumber", "singleton"]

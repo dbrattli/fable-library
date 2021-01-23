@@ -42,7 +42,7 @@ class Union(IComparable["Union"]):
         hashes = map(hash, self.fields)
         return hash([hash(self.tag), *hashes])
 
-    def __eq__(self, other: Union) -> bool:
+    def Equals(self, other: Union) -> bool:
         if self is other:
             return True
         elif self.tag == other.tag:
