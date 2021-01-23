@@ -33,6 +33,10 @@ class IComparable(IEquatable[T]):
         raise NotImplementedError
 
 
+def equals(a, b):
+    return a == b
+
+
 def assertEqual(actual: T, expected: T, msg: Optional[str] = None) -> None:
     if actual != expected:
         raise Exception(msg or f"Expected: ${expected} - Actual: ${actual}")

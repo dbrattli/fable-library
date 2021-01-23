@@ -1,8 +1,9 @@
+from pickletools import string1
 import re
 from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Callable, Match, Pattern, Union
+from typing import Any, Callable, Match, Optional, Pattern, Union
 
 # import multiply
 # import Numeric
@@ -152,15 +153,17 @@ def toConsole(arg: Union[IPrintfFormat, str]) -> Union[Any, Callable[[str], Any]
 #   return continuePrint((x: string) => console.error(x), arg);
 # }
 
-# export function toText(arg: IPrintfFormat | string): string {
-#   return continuePrint((x: string) => x, arg);
-# }
 
-# export function toFail(arg: IPrintfFormat | string) {
-#   return continuePrint((x: string) => {
-#     throw new Error(x);
-#   }, arg);
-# }
+def toText(arg: Union[IPrintfFormat, str]) -> str:
+    cont: Callable[[str], Any] = lambda x: x
+    return continuePrint(cont, arg)
+
+
+def toFail(arg: Union[IPrintfFormat, str]):
+    def fail(msg: str):
+        raise Exception(msg)
+
+    return continuePrint(fail, arg)
 
 
 def formatReplacement(rep: Any, prefix: Any, flags: Any, padLength: Any, precision: Any, format: Any):
@@ -331,9 +334,10 @@ def fsFormat(str: str):
 #   return str.substring(0, startIndex) + value + str.substring(startIndex);
 # }
 
-# export function isNullOrEmpty(str: string | any) {
-#   return typeof str !== "string" || str.length === 0;
-# }
+
+def isNullOrEmpty(string: Optional[str]):
+    not isinstance(string, str) or not len(string)
+
 
 # export function isNullOrWhiteSpace(str: string | any) {
 #   return typeof str !== "string" || /^\s*$/.test(str);
