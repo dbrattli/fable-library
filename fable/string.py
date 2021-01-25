@@ -1,3 +1,4 @@
+from argparse import ArgumentError
 from pickletools import string1
 import re
 from abc import ABC
@@ -316,16 +317,17 @@ def fsFormat(str: str):
 #   return idx >= 0 && idx === str.length - search.length;
 # }
 
-# export function initialize(n: number, f: (i: number) => string) {
-#   if (n < 0) {
-#     throw new Error("String length must be non-negative");
-#   }
-#   const xs = new Array(n);
-#   for (let i = 0; i < n; i++) {
-#     xs[i] = f(i);
-#   }
-#   return xs.join("");
-# }
+
+def initialize(n: int, f: Callable[[int], str]) -> str:
+    if n < 0:
+        raise Exception("String length must be non-negative")
+
+    xs = [""] * n
+    for i in range(n):
+        xs[i] = f(i)
+
+    return "".join(xs)
+
 
 # export function insert(str: string, startIndex: number, value: string) {
 #   if (startIndex < 0 || startIndex > str.length) {
@@ -411,9 +413,10 @@ def isNullOrEmpty(string: Optional[str]):
 #   return str.replace(new RegExp(escape(search), "g"), replace);
 # }
 
-# export function replicate(n: number, x: string) {
-#   return initialize(n, () => x);
-# }
+
+def replicate(n: int, x: str):
+    return initialize(n, lambda: x)
+
 
 # export function getCharAtIndex(input: string, index: number) {
 #   if (index < 0 || index >= input.length) {

@@ -9,10 +9,23 @@ def map(mapper: Callable[[A], B], xs: Seq[A]) -> Seq[B]:
     return xs.map(mapper)
 
 
+def skip(count: int, xs: Seq[A]) -> Seq[A]:
+    return xs.skip(count)
+
+
 delay = seq.delay
+head = seq.head
 rangeNumber = seq.range
 singleton = seq.singleton
 empty = seq.empty
 append = seq.concat
 
-__all__ = ["delay", "empty", "map", "rangeNumber", "singleton"]
+__all__ = [
+    "delay",
+    "empty",
+    "head",
+    "map",
+    "rangeNumber",
+    "singleton",
+    "skip",
+]

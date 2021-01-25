@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractstaticmethod
-from typing import List
+from typing import Any, List
 
 from .util import IComparable
 
@@ -42,13 +42,22 @@ class Union(IComparable["Union"]):
         hashes = map(hash, self.fields)
         return hash([hash(self.tag), *hashes])
 
-    def Equals(self, other: Union) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if self is other:
             return True
-        elif self.tag == other.tag:
+        if not isinstance(other, Union):
+            return False
+
+        if self.tag == other.tag:
             return self.fields == other.fields
 
         return False
+
+    def __lt__(self, other: Any) -> bool:
+        if self.tag == other.tag:
+            return self.fields < other.fields
+
+        return self.tag < other.tag
 
 
 class Record(IComparable["Record"]):

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar, Any, Optional
+from typing import Callable, Generic, Iterable, Tuple, TypeVar, Any, Optional
 
 T = TypeVar("T")
 
@@ -45,3 +45,27 @@ def assertEqual(actual: T, expected: T, msg: Optional[str] = None) -> None:
 def assertNotEqual(actual: T, expected: T, msg: Optional[str] = None) -> None:
     if actual == expected:
         raise Exception(msg or f"Expected: ${expected} - Actual: ${actual}")
+
+
+def createAtom(value: Optional[T] = None) -> Callable[[Optional[T], Optional[bool]], Optional[T]]:
+    atom = value
+
+    def _(value: Optional[T], isSetter: Optional[bool]) -> Optional[T]:
+        nonlocal atom
+
+        if not isSetter:
+            return atom
+        else:
+            atom = value
+            return None
+
+    return _
+
+
+def createObj(fields: Iterable[Tuple[str, Any]]):
+    obj: Any = {}
+
+    for k, v in fields:
+        obj[k] = v
+
+    return obj
