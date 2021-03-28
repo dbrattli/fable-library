@@ -77,4 +77,8 @@ class Record(IComparable["Record"]):
         return recordCompareTo(self, other)
 
 
-__all__ = ["Union"]
+class Attribute:
+    pass
+
+
+__all__ = ["Attribute", "Union"]

@@ -50,7 +50,7 @@ def assertNotEqual(actual: T, expected: T, msg: Optional[str] = None) -> None:
 def createAtom(value: Optional[T] = None) -> Callable[[Optional[T], Optional[bool]], Optional[T]]:
     atom = value
 
-    def _(value: Optional[T], isSetter: Optional[bool]) -> Optional[T]:
+    def _(value: Optional[T] = None, isSetter: Optional[bool] = None) -> Optional[T]:
         nonlocal atom
 
         if not isSetter:

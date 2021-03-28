@@ -13,6 +13,10 @@ def skip(count: int, xs: Seq[A]) -> Seq[A]:
     return xs.skip(count)
 
 
+def length(xs):
+    return len(xs)
+
+
 delay = seq.delay
 head = seq.head
 rangeNumber = seq.range
@@ -25,6 +29,7 @@ __all__ = [
     "empty",
     "head",
     "map",
+    "length",
     "rangeNumber",
     "singleton",
     "skip",
