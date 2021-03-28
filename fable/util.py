@@ -69,3 +69,11 @@ def createObj(fields: Iterable[Tuple[str, Any]]):
         obj[k] = v
 
     return obj
+
+
+def int32ToString(i: int, radix: int = 10):
+    convertString = "0123456789ABCDEF"
+    if i < radix:
+        return convertString[i]
+    else:
+        return int32ToString(i // radix, radix) + convertString[i % radix]

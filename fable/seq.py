@@ -6,23 +6,27 @@ B = TypeVar("B")
 
 
 def map(mapper: Callable[[A], B], xs: Seq[A]) -> Seq[B]:
-    return xs.map(mapper)
+    return Seq(xs).map(mapper)
 
 
 def skip(count: int, xs: Seq[A]) -> Seq[A]:
-    return xs.skip(count)
+    return Seq(xs).skip(count)
 
 
 def length(xs):
-    return len(xs)
+    return Seq(xs).length()
+
+
+def empty():
+    return seq.empty
 
 
 delay = seq.delay
 head = seq.head
 rangeNumber = seq.range
 singleton = seq.singleton
-empty = seq.empty
 append = seq.concat
+ofList = seq.of_list
 
 __all__ = [
     "delay",
