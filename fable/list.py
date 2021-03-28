@@ -20,8 +20,12 @@ def filter(predicate: Callable[[A], bool], lst: FrozenList[A]) -> FrozenList[A]:
     return lst.filter(predicate)
 
 
+def length(xs):
+    return len(xs)
+
+
 ofArray = FrozenList.of_seq
 ofSeq = FrozenList.of_seq
 singleton = FrozenList.singleton
 
-__all__ = ["map", "ofArray", "ofSeq", "singleton"]
+__all__ = ["length", "map", "ofArray", "ofSeq", "singleton"]
