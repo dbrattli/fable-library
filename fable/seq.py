@@ -25,6 +25,10 @@ def empty():
     return seq.empty
 
 
+def collect(mapper: Callable[[A], Seq[B]], lst: Seq[A]) -> Seq[B]:
+    return lst.collect(mapper)
+
+
 delay = seq.delay
 head = seq.head
 rangeNumber = seq.range

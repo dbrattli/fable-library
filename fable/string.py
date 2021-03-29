@@ -1,10 +1,8 @@
-from argparse import ArgumentError
-from pickletools import string1
 import re
 from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Callable, Match, Optional, Pattern, Union
+from typing import Any, Callable, Match, Optional, Pattern, Union, cast
 
 # import multiply
 # import Numeric
@@ -25,8 +23,8 @@ from .numeric import is_numeric, multiply
 # import { toString }
 
 fsFormatRegExp: Pattern[str] = re.compile(r"(^|[^%])%([0+\- ]*)(\d+)?(?:\.(\d+))?(\w)")
-# const interpolateRegExp = /(?:(^|[^%])%([0+\- ]*)(\d+)?(?:\.(\d+))?(\w))?%P\(\)/g;
-# const formatRegExp = /\{(\d+)(,-?\d+)?(?:\:([a-zA-Z])(\d{0,2})|\:(.+?))?\}/g;
+interpolateRegExp: Pattern[str] = re.compile(r"(?:(^|[^%])%([0+\- ]*)(\d+)?(?:\.(\d+))?(\w))?%P\(\)")
+formatRegExp: Pattern[str] = re.compile(r"\{(\d+)(,-?\d+)?(?:\:([a-zA-Z])(\d{0,2})|\:(.+?))?\}")
 
 
 def is_less_than(x: Numeric, y: int) -> bool:
@@ -131,14 +129,6 @@ def printf(input: str) -> IPrintfFormat:
     return IPrintfFormat(input=input, cont=format)
 
 
-# export function interpolate(input: string, values: any[]): string {
-#   let i = 0;
-#   return input.replace(interpolateRegExp, (_, prefix, flags, padLength, precision, format) => {
-#     return formatReplacement(values[i++], prefix, flags, padLength, precision, format);
-#   });
-# }
-
-
 def continuePrint(cont: Callable[[str], Any], arg: Union[IPrintfFormat, str]) -> Union[Any, Callable[[str], Any]]:
     if isinstance(arg, str):
         return cont(arg)
@@ -157,7 +147,7 @@ def toConsole(arg: Union[IPrintfFormat, str]) -> Union[Any, Callable[[str], Any]
 
 def toText(arg: Union[IPrintfFormat, str]) -> str:
     cont: Callable[[str], Any] = lambda x: x
-    return continuePrint(cont, arg)
+    return cast(str, continuePrint(cont, arg))
 
 
 def toFail(arg: Union[IPrintfFormat, str]):
@@ -167,10 +157,10 @@ def toFail(arg: Union[IPrintfFormat, str]):
     return continuePrint(fail, arg)
 
 
-def formatReplacement(rep: Any, prefix: Any, flags: Any, padLength: Any, precision: Any, format: Any):
+def formatReplacement(rep: Any, flags: Any, padLength: Any, precision: Any, format: Any):
     sign = ""
-    flags: str = flags or ""
-    format: str = format or ""
+    flags = flags or ""
+    format = format or ""
 
     if is_numeric(rep):
         if format.lower() != "x":
@@ -218,13 +208,34 @@ def formatReplacement(rep: Any, prefix: Any, flags: Any, padLength: Any, precisi
     else:
         rep = sign + rep
 
-    return prefix + rep if prefix else rep
+    return rep
+
+
+def interpolate(string: str, values: Any) -> str:
+    valIdx = 0
+    strIdx = 0
+    result = ""
+    matches = interpolateRegExp.finditer(string)
+    for match in matches:
+        # The first group corresponds to the no-escape char (^|[^%]), the actual pattern starts in the next char
+        # Note: we don't use negative lookbehind because some browsers don't support it yet
+        matchIndex = match.start() + len(match[1] or "")
+        result += string[strIdx:matchIndex].replace("%%", "%")
+        [_, flags, padLength, precision, format] = match.groups()
+        # print(match.groups())
+        result += formatReplacement(values[valIdx], flags, padLength, precision, format)
+        valIdx += 1
+
+        strIdx = match.end()
+
+    result += string[strIdx:].replace("%%", "%")
+    return result
 
 
 def formatOnce(str2: str, rep: Any):
     def match(m: Match[str]):
         prefix, flags, padLength, precision, format = m.groups()
-        once: str = formatReplacement(rep, prefix, flags, padLength, precision, format)
+        once: str = formatReplacement(rep, flags, padLength, precision, format)
         return once.replace("%", "%%")
 
     return fsFormatRegExp.sub(match, str2, count=1)
