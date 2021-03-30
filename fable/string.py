@@ -9,14 +9,12 @@ from typing import Any, Callable, Match, Optional, Pattern, Union, cast
 # import toExponential
 # import toFixed
 # import toHex
-# import toPrecision }
+# import toPrecision
 # import "./Date.js"
 # import "./Numeric.js"
 # import "./RegExp.js"
 # import "./Types.js"
-from .numeric import Numeric
-from .numeric import compare as numeric_compare
-from .numeric import is_numeric, multiply
+from .numeric import to_fixed, to_precision, to_exponential
 
 # import { escape }
 # import { toString as dateToString }
@@ -25,10 +23,6 @@ from .numeric import is_numeric, multiply
 fsFormatRegExp: Pattern[str] = re.compile(r"(^|[^%])%([0+\- ]*)(\d+)?(?:\.(\d+))?(\w)")
 interpolateRegExp: Pattern[str] = re.compile(r"(?:(^|[^%])%([0+\- ]*)(\d+)?(?:\.(\d+))?(\w))?%P\(\)")
 formatRegExp: Pattern[str] = re.compile(r"\{(\d+)(,-?\d+)?(?:\:([a-zA-Z])(\d{0,2})|\:(.+?))?\}")
-
-
-def is_less_than(x: Numeric, y: int) -> bool:
-    return numeric_compare(x, y) < 0
 
 
 # const enum StringComparison {
@@ -125,11 +119,13 @@ class IPrintfFormat(ABC):
 
 
 def printf(input: str) -> IPrintfFormat:
+    # print("printf: ", input)
     format: IPrintfFormatContinuation = fsFormat(input)
     return IPrintfFormat(input=input, cont=format)
 
 
 def continuePrint(cont: Callable[[str], Any], arg: Union[IPrintfFormat, str]) -> Union[Any, Callable[[str], Any]]:
+    # print("continuePrint", cont)
     if isinstance(arg, str):
         return cont(arg)
 
@@ -162,10 +158,10 @@ def formatReplacement(rep: Any, flags: Any, padLength: Any, precision: Any, form
     flags = flags or ""
     format = format or ""
 
-    if is_numeric(rep):
+    if isinstance(rep, (int, float)):
         if format.lower() != "x":
-            if is_less_than(rep, 0):
-                rep = multiply(rep, -1)
+            if rep < 0:
+                rep = rep * -1
                 sign = "-"
             else:
                 if flags.find(" ") >= 0:
@@ -173,19 +169,19 @@ def formatReplacement(rep: Any, flags: Any, padLength: Any, precision: Any, form
                 elif flags.find("+") >= 0:
                     sign = "+"
 
-        precision = None if precision is None else int(precision)
+        elif format == "x":
+            rep = "{0:x}".format(rep)
+        elif format == "X":
+            rep = "{0:x}".format(rep).upper()
 
+        precision = None if precision is None else int(precision)
         if format in ("f", "F"):
             precision = precision if precision is not None else 6
-            rep = toFixed(rep, precision)
+            rep = to_fixed(rep, precision)
         elif format in ("g", "G"):
-            rep = toPrecision(rep, precision) if precision is not None else toPrecision(rep)
+            rep = to_precision(rep, precision) if precision is not None else to_precision(rep)
         elif format in ("e", "E"):
-            rep = toExponential(rep, precision) if precision is not None else toExponential(rep)
-        elif format == "x":
-            rep = toHex(rep)
-        elif format == "X":
-            rep = toHex(rep).upper()
+            rep = to_exponential(rep, precision) if precision is not None else to_exponential(rep)
         else:  # AOid
             rep = str(rep)
 
@@ -233,20 +229,31 @@ def interpolate(string: str, values: Any) -> str:
 
 
 def formatOnce(str2: str, rep: Any):
+    # print("formatOnce: ", str2, rep)
+
     def match(m: Match[str]):
         prefix, flags, padLength, precision, format = m.groups()
+        # print("prefix: ", [prefix])
         once: str = formatReplacement(rep, flags, padLength, precision, format)
-        return once.replace("%", "%%")
+        # print("once:", [once])
+        return prefix + once.replace("%", "%%")
 
-    return fsFormatRegExp.sub(match, str2, count=1)
+    ret = fsFormatRegExp.sub(match, str2, count=1)
+    # print(ret)
+    return ret
 
 
 def createPrinter(string: str, cont: Callable[..., Any]):
+    # print("createPrinter", string)
+
     def _(*args: Any):
         strCopy: str = string
         for arg in args:
+            # print("Arg: ", [arg])
             strCopy = formatOnce(strCopy, arg)
+            # print("strCopy", strCopy)
 
+        # print("strCopy", strCopy)
         if fsFormatRegExp.search(strCopy):
             return createPrinter(strCopy, cont)
         return cont(strCopy.replace("%%", "%"))
@@ -255,6 +262,8 @@ def createPrinter(string: str, cont: Callable[..., Any]):
 
 
 def fsFormat(str: str):
+    # print("fsFormat: ", [str])
+
     def _(cont: Callable[..., Any]):
         if fsFormatRegExp.search(str):
             return createPrinter(str, cont)
