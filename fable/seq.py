@@ -14,18 +14,6 @@ def filter(predicate: Callable[[A], bool], xs: Seq[A]) -> Seq[A]:
     return Seq(xs).filter(predicate)
 
 
-def skip(count: int, xs: Seq[A]) -> Seq[A]:
-    return Seq(xs).skip(count)
-
-
-def sum(source: Iterable[A]) -> A:
-    return Seq(source).sum()
-
-
-def sumBy(projection: Callable[[A], B], source: Iterable[A]) -> B:
-    return Seq(source).sum_by(projection)
-
-
 def length(xs):
     return Seq(xs).length()
 
@@ -38,6 +26,18 @@ def collect(mapper: Callable[[A], Seq[B]], lst: Seq[A]) -> Seq[B]:
     return lst.collect(mapper)
 
 
+def skip(count: int, xs: Seq[A]) -> Seq[A]:
+    return Seq(xs).skip(count)
+
+
+def sum(source: Iterable[A]) -> A:
+    return Seq(source).sum()
+
+
+def sumBy(projection: Callable[[A], B], source: Iterable[A]) -> B:
+    return Seq(source).sum_by(projection)
+
+
 delay = seq.delay
 head = seq.head
 rangeNumber = seq.range
@@ -46,6 +46,7 @@ append = seq.concat
 ofList = seq.of_list
 toList = frozenlist.of_seq
 concat = seq.concat
+tail = seq.tail
 
 __all__ = [
     "delay",
@@ -56,4 +57,5 @@ __all__ = [
     "rangeNumber",
     "singleton",
     "skip",
+    "tail",
 ]

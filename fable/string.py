@@ -190,8 +190,6 @@ def formatReplacement(rep: Any, flags: Any, padLength: Any, precision: Any, form
     elif isinstance(rep, datetime):
         rep = dateToString(rep)
     else:
-        print("Got here2", rep, format)
-
         rep = toString(rep)
 
     if padLength is not None:
