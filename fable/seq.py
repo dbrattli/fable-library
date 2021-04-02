@@ -22,8 +22,8 @@ def empty():
     return seq.empty
 
 
-def collect(mapper: Callable[[A], Seq[B]], lst: Seq[A]) -> Seq[B]:
-    return lst.collect(mapper)
+def collect(mapper: Callable[[A], Seq[B]], source: Seq[A]) -> Seq[B]:
+    return Seq(source).collect(mapper)
 
 
 def skip(count: int, xs: Seq[A]) -> Seq[A]:
@@ -34,7 +34,7 @@ def sum(source: Iterable[A]) -> A:
     return Seq(source).sum()
 
 
-def sumBy(projection: Callable[[A], B], source: Iterable[A]) -> B:
+def sumBy(projection: Callable[[A], B], source: Iterable[A], _) -> B:
     return Seq(source).sum_by(projection)
 
 
