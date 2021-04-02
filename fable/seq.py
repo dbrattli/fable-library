@@ -1,4 +1,5 @@
-from typing import Callable, TypeVar
+from typing import Callable, Iterable, TypeVar
+from aioreactive import TResult, TSource
 from expression.collections import Seq, seq, frozenlist
 
 A = TypeVar("A")
@@ -15,6 +16,14 @@ def filter(predicate: Callable[[A], bool], xs: Seq[A]) -> Seq[A]:
 
 def skip(count: int, xs: Seq[A]) -> Seq[A]:
     return Seq(xs).skip(count)
+
+
+def sum(source: Iterable[A]) -> A:
+    return Seq(source).sum()
+
+
+def sumBy(projection: Callable[[A], B], source: Iterable[A]) -> B:
+    return Seq(source).sum_by(projection)
 
 
 def length(xs):

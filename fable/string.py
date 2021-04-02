@@ -15,6 +15,7 @@ from typing import Any, Callable, Match, Optional, Pattern, Union, cast
 # import "./RegExp.js"
 # import "./Types.js"
 from .numeric import to_fixed, to_precision, to_exponential
+from .types import toString
 
 # import { escape }
 # import { toString as dateToString }
@@ -154,6 +155,7 @@ def toFail(arg: Union[IPrintfFormat, str]):
 
 
 def formatReplacement(rep: Any, flags: Any, padLength: Any, precision: Any, format: Any):
+    print("Got here", rep, format)
     sign = ""
     flags = flags or ""
     format = format or ""
@@ -188,7 +190,9 @@ def formatReplacement(rep: Any, flags: Any, padLength: Any, precision: Any, form
     elif isinstance(rep, datetime):
         rep = dateToString(rep)
     else:
-        rep = str(rep)
+        print("Got here2", rep, format)
+
+        rep = toString(rep)
 
     if padLength is not None:
         padLength = int(padLength)
@@ -429,9 +433,9 @@ def isNullOrEmpty(string: Optional[str]):
 #   return str.slice(0, startIndex) + (typeof count === "number" ? str.substr(startIndex + count) : "");
 # }
 
-# export function replace(str: string, search: string, replace: string) {
-#   return str.replace(new RegExp(escape(search), "g"), replace);
-# }
+
+def replace(string: str, search: str, replace: str):
+    return re.sub(search, replace, string)
 
 
 def replicate(n: int, x: str):

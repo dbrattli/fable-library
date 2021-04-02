@@ -73,6 +73,14 @@ def full_name(t: TypeInfo) -> str:
     return t.fullname
 
 
+def list_type(generic: TypeInfo) -> TypeInfo:
+    return TypeInfo("Microsoft.FSharp.Collections.FSharpList`1", [generic])
+
+
+def array_type(generic: TypeInfo) -> TypeInfo:
+    return TypeInfo(generic.fullname + "[]", [generic])
+
+
 def tuple_type(*generics: TypeInfo) -> TypeInfo:
     return TypeInfo(fullname=f"System.Tuple`{len(generics)}", generics=list(generics))
 

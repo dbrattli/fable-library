@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractstaticmethod
-from typing import Any, List
+from typing import Any, Iterable, List
 
 from .util import IComparable
 
@@ -60,6 +60,36 @@ class Union(IComparable["Union"]):
         return self.tag < other.tag
 
 
+def recordEquals(self, other):
+    if self is other:
+        return True
+
+    else:
+        for name in self.keys():
+            if self[name] != other.get(name):
+                return False
+
+        return True
+
+
+def recordCompareTo(self, other):
+    if self is other:
+        return 0
+
+    else:
+        for name in self.keys():
+            if self[name] < other.get(name):
+                return -1
+            elif self[name] > other.get(name):
+                return 1
+
+        return 0
+
+
+def recordGetHashCode(self):
+    return hash(*self.values())
+
+
 class Record(IComparable["Record"]):
     def toJSON(self) -> str:
         return recordToJSON(this)
@@ -76,9 +106,56 @@ class Record(IComparable["Record"]):
     def CompareTo(self, other: Record) -> int:
         return recordCompareTo(self, other)
 
+    def __lt__(self, other: Any) -> bool:
+        raise NotImplementedError
+
+    def __eq__(self, other: Any) -> bool:
+        return recordEquals(self, other)
+
+    def __hash__(self) -> int:
+        return recordGetHashCode(self)
+
 
 class Attribute:
     pass
+
+
+def seqToString(self):
+    str = "["
+
+    for count, x in enumerate(self):
+        if count == 0:
+            str += toString(x)
+
+        elif count == 100:
+            str += "; ..."
+            break
+
+        else:
+            str += "; " + toString(x)
+
+    return str + "]"
+
+
+def toString(x, callStack=0):
+    if x is not None:
+        # if (typeof x.toString === "function") {
+        #    return x.toString();
+
+        if isinstance(x, str):
+            return str(x)
+
+        if isinstance(x, Iterable):
+            return seqToString(x)
+
+        # else: // TODO: Date?
+        #     const cons = Object.getPrototypeOf(x).constructor;
+        #     return cons === Object && callStack < 10
+        #         // Same format as recordToString
+        #         ? "{ " + Object.entries(x).map(([k, v]) => k + " = " + toString(v, callStack + 1)).join("\n  ") + " }"
+        #         : cons.name;
+
+    return str(x)
 
 
 __all__ = ["Attribute", "Union"]
